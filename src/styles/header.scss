@@ -1,0 +1,51 @@
+.header {
+  background-color: black;
+  position: fixed;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  height: var(--header-height);
+  align-items: center;
+  border-bottom: var(--g-border);
+  font-size: 1.35rem;
+  padding-inline: var(--g-padding);
+  text-transform: uppercase;
+  z-index: 999;
+
+  h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(calc(-50% + var(--header-height) / 2), -50%);
+  }
+
+  .menu-btn {
+    display: none;
+  }
+}
+
+/* 반응형 */
+@include mobile {
+  .header {
+    > div,
+    .primary-btn {
+      display: none;
+    }
+
+    h1 {
+      position: static;
+      top: auto;
+      left: auto;
+      transform: translate(0);
+    }
+
+    .menu-btn {
+      display: inherit;
+    }
+  }
+}
+
+/* Gsap Setting */
+.header {
+  transform: translateY(-100%);
+}

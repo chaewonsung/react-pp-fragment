@@ -1,0 +1,112 @@
+.intro-sec {
+  &__top {
+    font-family: var(--font-glare);
+    font-size: 3.4vw;
+    line-height: 1.2;
+    font-weight: 300;
+    p {
+      width: 40%;
+      &:nth-child(2) {
+        margin-left: 50%;
+      }
+    }
+  }
+  &__bottom {
+    display: flex;
+    gap: 13%;
+    // font-size: 1.7rem;
+
+    &-left {
+      width: 37%;
+      flex-shrink: 0;
+      img {
+        width: 100%;
+      }
+      dl {
+        margin-top: 1em;
+
+        > * {
+          @include create-fake-border;
+          position: relative;
+          padding-block: 0.6em;
+          display: flex;
+          align-items: flex-start;
+          > * {
+            flex: 1;
+          }
+        }
+
+        &.active {
+          @for $i from 1 through 5 {
+            > *:nth-child(#{$i}) {
+              @include active-fake-border {
+                transition-delay: ($i - 1) * 0.1s;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &-right {
+      margin-top: var(--space-l);
+      flex: 1;
+
+      .text {
+        font-family: var(--font-text);
+        display: flex;
+        margin-bottom: 11em;
+        line-height: 1.7;
+
+        > * {
+          flex: 1;
+          padding-right: 14%;
+        }
+      }
+    }
+  }
+}
+
+/* 반응형 */
+@include tablet {
+  .intro-sec {
+    &__bottom {
+      flex-direction: column;
+      &-left {
+        width: auto;
+      }
+    }
+  }
+}
+
+@include mobile {
+  .intro-sec {
+    &__top {
+      margin-bottom: var(--space-l);
+      p {
+        width: 80%;
+        &:nth-child(2) {
+          margin-left: 20%;
+          margin-top: 50px;
+        }
+      }
+    }
+
+    &__bottom {
+      &-right {
+        .text {
+          flex-direction: column;
+          gap: 80px;
+          p {
+            width: 80%;
+            padding: 0;
+
+            &:nth-child(2) {
+              align-self: flex-end;
+            }
+          }
+        }
+      }
+    }
+  }
+}

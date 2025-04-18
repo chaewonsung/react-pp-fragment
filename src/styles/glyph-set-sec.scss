@@ -1,0 +1,95 @@
+
+.glyph-set-sec {
+  --glyph-set-header-height: 4rem;
+  padding-inline: 0;
+
+  &__header {
+    position: sticky;
+    top: var(--header-height);
+    border-bottom: 1px solid white;
+    background-color: black;
+    z-index: 1;
+  }
+
+  .select-box {
+    position: relative;
+    width: 50%;
+    height: 5rem;
+    line-height: 5rem;
+
+    > button {
+      border-bottom: 0;
+    }
+  }
+
+  &__content {
+    --fw: 200;
+    
+    display: flex;
+    border-bottom: 1px solid white;
+    font-weight: var(--fw);
+    font-family: var(--ff);
+
+    > * {
+      width: 50%;
+    }
+  }
+
+  &__glyph-set {
+    border-right: 1px solid white;
+    padding: var(--g-padding);
+
+    p {
+      font-size: clamp(3rem, 3.4vw, 70px);
+      padding-block: 1.5em 2em;
+      font-family: var(--font-glare);
+      font-weight: 300;
+    }
+  }
+
+  &__result {
+    position: sticky;
+    top: 100px;
+    top: calc(var(--header-height) + var(--glyph-set-header-height));
+    height: calc(var(--full-vh) - var(--glyph-set-header-height));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: min(80vh, 35vw);
+  }
+}
+
+.glyph-set {
+  display: grid;
+  font-size: 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(2em, 1fr));
+
+  li {
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+      background-color: white;
+      color: black;
+    }
+  }
+}
+
+@include mobile {
+  .glyph-set-sec {
+    .select-box {
+      width: 100%;
+      border-inline: none;
+    }
+
+    &__glyph-set {
+      width: 100%;
+      border: none;
+    }
+
+    &__result {
+      display: none;
+    }
+  }
+}

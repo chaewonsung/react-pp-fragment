@@ -1,0 +1,134 @@
+.nav {
+  --nav-width: 40%;
+  --nav-min-width: 45rem;
+
+  position: fixed;
+  top: var(--header-height);
+  bottom: 0;
+  right: 100%;
+  width: var(--nav-width);
+  min-width: var(--nav-min-width);
+  background-color: black;
+  z-index: 999;
+
+  &__controller {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--sidebar-width);
+    height: 100%;
+    border-right: var(--g-border);
+
+    h2 {
+      position: absolute;
+      left: 50%;
+      bottom: var(--g-padding);
+      transform-origin: left center;
+      transform: rotate(-90deg) translateX(-6px);
+      white-space: nowrap;
+    }
+
+    .menu-btn {
+      @include place-center();
+      width: 50%;
+    }
+  }
+
+  &__content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--global-padding);
+    padding-right: var(--sidebar-width);
+    overflow: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+/* Nav Toggle Animation */
+.nav {
+  transition: transform 0.3s;
+
+  &.open {
+    transform: translateX(100%);
+  }
+}
+
+/* GSAP Setting */
+.nav {
+  --gsap-progress: 0;
+  transform: translateX(calc(var(--sidebar-width) * var(--gsap-progress)));
+}
+
+.lnb {
+  font-size: 3.15rem;
+  &__typo {
+    font-family: var(--font-serif);
+    padding-block: 0.75em 2em;
+  }
+
+  &__list {
+    margin-bottom: 2em;
+    line-height: 1.3;
+    text-transform: capitalize;
+
+    li::before {
+      display: inline-block;
+      margin-right: 1.2em;
+    }
+    li:nth-child(1)::before {
+      content: '①';
+    }
+    li:nth-child(2)::before {
+      content: '②';
+    }
+    li:nth-child(3)::before {
+      content: '③';
+    }
+    li:nth-child(4)::before {
+      content: '④';
+    }
+    li:nth-child(5)::before {
+      content: '⑤';
+    }
+    li:nth-child(6)::before {
+      content: '⑥';
+    }
+  }
+}
+
+.gnb {
+  &__top {
+    line-height: 1.5;
+    margin-bottom: 2em;
+    a {
+      &::before {
+        content: '→';
+        display: inline-block;
+        margin-right: 0.5em;
+      }
+    }
+  }
+
+  &__bottom {
+    display: flex;
+    gap: 1.7em;
+  }
+}
+
+/* 반응형 */
+@include mobile {
+  .nav {
+    --nav-width: 100%;
+    left: -100%;
+
+    &__controller {
+      h2 {
+        display: none;
+      }
+    }
+  }
+}
