@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
-import useSplitText from '../../hooks/useSplitText';
+import React, { useEffect, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { getGsapCharTween } from '../../utils/gsapTween';
+import SplitLine from '../common/SplitText';
 
 const CARD_DATA = [
   { id: 1, header: ['①', 'BUY'], text: 'buy PP® Fragment' },
@@ -28,24 +28,23 @@ const CardList = () => {
 
 const Card = ({ header, text }) => {
   const containerRef = useRef();
-  const lineArrRef = useRef([]);
   const textRef = useRef();
-  const [splittedText] = useSplitText(textRef, 'line, char');
+  const [_, setState] = useState();
 
   useGSAP(
     (_, contextSafe) => {
-      if (!splittedText.length) return;
+      if (!textRef.current.node) return;
 
+      const lines = [...textRef.current.node.children];
       const tl = gsap.timeline({ paused: true });
 
-      lineArrRef.current.forEach((line, i) => {
-        const tween = getGsapCharTween(line.children);
+      lines.forEach((line, i) => {
+        const q = gsap.utils.selector(line);
+        const tween = getGsapCharTween(q('.char'));
         tl.add(tween, i * 0.08);
       });
 
-      const handleMouseenter = contextSafe(() => {
-        tl.restart();
-      });
+      const handleMouseenter = contextSafe(() => tl.restart());
 
       containerRef.current.addEventListener('mouseenter', handleMouseenter);
 
@@ -56,7 +55,7 @@ const Card = ({ header, text }) => {
         );
       };
     },
-    { dependencies: [splittedText], scope: containerRef }
+    { dependencies: [textRef.current], scope: containerRef }
   );
 
   return (
@@ -65,23 +64,15 @@ const Card = ({ header, text }) => {
         <span>{header[0]}</span>
         <span>{header[1]}</span>
       </div>
-      <div className="card__text" ref={textRef}>
-        {splittedText.length
-          ? splittedText.map(({ char }, i) => (
-              <div
-                className="line-wrapper"
-                key={i}
-                ref={(el) => (lineArrRef.current[i] = el)}
-              >
-                {char.map((c, i) => (
-                  <span className="char" key={i}>
-                    {c}
-                  </span>
-                ))}
-              </div>
-            ))
-          : text}
-      </div>
+      <SplitLine
+        as="div"
+        splitChar
+        className="card__text"
+        ref={textRef}
+        setParentState={setState}
+      >
+        {text}
+      </SplitLine>
       <div className="card__arrow">→</div>
     </a>
   );

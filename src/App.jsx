@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './components/header/Header';
 import Nav from './components/nav/Nav';
 import VisualSec from './components/visual-sec/VisualSec';
@@ -14,100 +14,131 @@ import './styles/common/common.scss';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import gsap from 'gsap';
-import LineSplitter from './components/common/SplitLine';
+import toPX from './utils/toPX';
+import NavContextProvider from './contexts/nav';
+
+const loadAnimTlConfig = {
+  x: [
+    -50, -50, -20, 20, 10, 30, -20, 40, 50, 60, -30, -20, -15, -5, -40, -10, 15,
+    20, 5, -5, 40, 20, 7, 40, -10,
+  ],
+  y: [
+    -40, -20, -50, 20, 10, -40, -50, -10, -90, -20, -20, 50, 30, 50, 20, 20,
+    -20, 50, 70, 40, -15, 30, 20, 10, 50,
+  ],
+  rotate: [
+    10, 45, -45, -15, 45, -25, -30, -35, 45, -30, 25, 15, -30, -10, -20, 10,
+    -10, -30, -10, 25, 15, -10, -5, -10, 10,
+  ],
+};
 
 const App = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
   gsap.registerPlugin(useGSAP, ScrollTrigger);
   setTimeout(() => ScrollTrigger.refresh(), 10);
 
-  // useGSAP(() => {
-  //   gsap
-  //     .timeline({
-  //       onStart: () => {
-  //         scrollTo(0, 0);
-  //       },
-  //     })
-  //     .to('.visual-sec__bg img', {
-  //       keyframes: [
-  //         {
-  //           opacity: 1,
-  //           stagger: {
-  //             from: 'random',
-  //             amount: 2,
-  //           },
-  //           duration: 3,
-  //         },
-  //         { scale: 0.85, duration: 0.8, delay: -1, ease: 'power2.inOut' },
-  //         {
-  //           // x: () => `random(-${innerWidth / 2}, ${innerWidth / 2})`,
-  //           xPercent: 'random(-50,50)',
-  //           y: () => `random(-${innerHeight / 2}, ${innerHeight})`,
-  //           rotate: `random(0, 360)`,
-  //           ease: 'power3.out',
-  //           duration: 2,
-  //         },
-  //       ],
-  //     })
-  //     .to(
-  //       '.title-typo .roller-inner',
-  //       {
-  //         yPercent: 100,
-  //         duration: () => gsap.utils.random(2, 4, 1),
-  //         ease: 'power4.inOut',
-  //       },
-  //       '<70%'
-  //     )
-  //     .to(
-  //       '.title-typo__year',
-  //       {
-  //         scaleX: 1,
-  //       },
-  //       '<50%'
-  //     )
-  //     .to(
-  //       '.title-typo__ff span',
-  //       {
-  //         y: 0,
-  //         stagger: 0.1,
-  //       },
-  //       '<'
-  //     )
-  //     .to(
-  //       '.header',
-  //       {
-  //         y: 0,
-  //       },
-  //       '<50%'
-  //     )
-  //     .to(
-  //       '.visual-sec__bottom .line',
-  //       {
-  //         y: 0,
-  //         delay: (i) => (i % 2 === 0 ? 0 : 0.1),
-  //       },
-  //       '<50%'
-  //     )
-  //     .to(
-  //       '.nav',
-  //       {
-  //         '--gsap-progress': 1,
-  //         autoRound: false,
-  //       },
-  //       '<'
-  //     );
-  // });
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-  // useGSAP(() => {
-  //   ScrollTrigger.batch('.observe', {
-  //     onEnter: (elem) => {
-  //       elem.forEach((el) => el.classList.add('active'));
-  //     },
-  //   });
-  // });
+  useGSAP(() => {
+    if (!isMounted) return;
+
+    gsap
+      .timeline({
+        onStart: () => {
+          scrollTo(0, 0);
+        },
+      })
+      .addLabel('label-1')
+      .to('.visual-sec__bg img', {
+        keyframes: [
+          {
+            opacity: 1,
+            stagger: {
+              from: 'random',
+              amount: 2,
+            },
+            duration: 3,
+          },
+          { scale: 0.85, duration: 0.8, delay: -1, ease: 'power2.inOut' },
+          {
+            x: (i) => toPX(loadAnimTlConfig.x[i] + 'vw'),
+            y: (i) => toPX(loadAnimTlConfig.y[i] + 'vh'),
+            rotate: (i) => loadAnimTlConfig.rotate[i],
+            ease: 'power3.out',
+            duration: 2,
+          },
+        ],
+      })
+      .to('.visual-sec__bg > div', {
+        y: (i) => (i % 2 ? '+=50' : '-=50'),
+        repeat: -1,
+        yoyo: true,
+        ease: 'none',
+        duration: 3,
+      })
+      .to(
+        '.title-typo .roller-inner',
+        {
+          yPercent: 100,
+          duration: () => gsap.utils.random(2, 4, 1),
+          ease: 'power4.inOut',
+        },
+        'label-1+=4.5'
+      )
+      .to(
+        '.title-typo__year',
+        {
+          scaleX: 1,
+        },
+        '<50%'
+      )
+      .to(
+        '.title-typo__ff span',
+        {
+          y: 0,
+          stagger: 0.1,
+        },
+        '<'
+      )
+      .to(
+        '.header',
+        {
+          y: 0,
+        },
+        '<50%'
+      )
+      .to(
+        '.visual-sec__bottom .line',
+        {
+          y: 0,
+          delay: (i) => (i % 2 === 0 ? 0 : 0.1),
+        },
+        '<50%'
+      )
+      .to(
+        '.nav',
+        {
+          '--gsap-progress': 1,
+          autoRound: false,
+        },
+        '<'
+      );
+  }, [isMounted]);
+
+  useGSAP(() => {
+    ScrollTrigger.batch('.observe', {
+      onEnter: (elem) => {
+        elem.forEach((el) => el.classList.add('active'));
+      },
+    });
+  });
 
   return (
-    <>
-      {/* <Header />
+    <NavContextProvider>
+      <Header />
       <Nav />
       <main>
         <VisualSec />
@@ -119,16 +150,8 @@ const App = () => {
         <SpecialCharSec />
         <NavigationSec />
       </main>
-      <Footer /> */}
-      <LineSplitter style={{ width: '30%' }}>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi
-        praesentium harum <span style={{ color: 'pink' }}>temporibus</span>
-        <div>
-          facere consectetur vitae <span style={{ color: 'blue' }}>fuga est</span> voluptatem quasi.
-          Unde?
-        </div>
-      </LineSplitter>
-    </>
+      <Footer />
+    </NavContextProvider>
   );
 };
 

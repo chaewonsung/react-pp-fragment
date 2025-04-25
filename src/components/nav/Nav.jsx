@@ -1,54 +1,34 @@
-import React from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import '@/styles/nav';
 import MenuBtn from '../common/MenuBtn';
-import Link from '../common/Link';
+import { NavContext } from '../../contexts/nav';
+import NavContent from './NavContent';
+import classNames from 'classnames';
 
 const Nav = () => {
+  const [isOpen, setIsOpen] = useContext(NavContext);
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickDoc = (e) => {
+      if (navRef.current.contains(e.target)) return;
+      setIsOpen(false);
+    };
+
+    document.addEventListener('click', handleClickDoc);
+
+    return () => {
+      document.removeEventListener('click', handleClickDoc);
+    };
+  }, []);
+
   return (
-    <nav className="nav">
+    <nav className={classNames('nav', { open: isOpen })} ref={navRef}>
       <div className="nav__controller">
         <h2>Table of Contents</h2>
         <MenuBtn />
       </div>
-      <div className="nav__content" id="nav-menu" aria-hidden="true">
-        <div className="lnb">
-          <div className="lnb__typo split-char split-char">Fragment</div>
-          <ul className="lnb__list">
-            {[
-              'introduction',
-              'from sans to serif',
-              'glyph set',
-              'font sampler',
-              'fragment in use',
-              'special characters',
-            ].map((v) => (
-              <li key={v}>
-                <a href={`#${v.split().join('-')}`} className="line-wrapper">
-                  <span className="line">{v}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <a href="/" className="lnb__get-font split-char split-char">
-            Get 〖the font〗
-          </a>
-        </div>
-        <div className="gnb">
-          <div className="gnb__top">
-            <div>
-              <Link>Pangram Pangram® Foundry</Link>
-            </div>
-            <div>
-              <Link>Locomotive</Link>
-            </div>
-          </div>
-          <div className="gnb__bottom">
-            <Link>Terms & Conditions</Link>
-            <Link>FAQ</Link>
-            <Link>Contact</Link>
-          </div>
-        </div>
-      </div>
+      <NavContent />
     </nav>
   );
 };

@@ -120,6 +120,7 @@ section {
   text-align: center;
   border: 1px solid white;
   background-color: black;
+  cursor: pointer;
 
   .line-wrapper {
     transform: translateY(2px);
@@ -130,20 +131,6 @@ section {
     border: 1px solid black;
   }
 }
-
-// .char-wrapper {
-//   overflow: hidden;
-//   display: inline-flex;
-// }
-
-// .line-wrapper {
-//   display: inline-block;
-//   overflow: hidden;
-//   > * {
-//     display: inline-block;
-//     // transform: translateY(100%);
-//   }
-// }
 
 .menu-btn {
   --Y: 0.3em;
@@ -209,6 +196,8 @@ section {
 }
 
 .select-box {
+  position: relative;
+
   * {
     text-transform: capitalize;
   }
@@ -217,22 +206,24 @@ section {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding-inline: 1em;
+    padding: var(--padding, 0.7em 1em);
     border: 1px solid white;
   }
 
   ul {
     position: absolute;
     top: 100%;
-    height: 35vh;
+    max-height: 35vh;
     overflow: auto;
     width: 100%;
     background-color: black;
     border: 1px solid white;
+    border-top: 0;
     text-transform: capitalize;
+    z-index: 1;
 
     li {
-      padding-inline: 1em;
+      padding: var(--padding, 0.7em 1em);
       &:hover {
         background-color: white;
         color: black;
@@ -271,21 +262,6 @@ section {
   }
 }
 
-.line:has(.char) {
-  display: flex !important;
-  justify-content: center;
-}
-
 .line-wrapper {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  .line,
-  .char {
-    display: inline-block;
-  }
-}
-
-.char-wrapper {
   overflow: hidden;
 }

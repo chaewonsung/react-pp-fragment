@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '@/styles/visual-sec';
 import TitleTypo from './TitleTypo';
-import Link from '../common/Link';
-import { SplitLine } from '../common/SplitText';
+import SplitLine from '../common/SplitText';
 
 const VisualSec = () => {
   return (
@@ -15,24 +14,16 @@ const VisualSec = () => {
         ))}
       </div>
       <TitleTypo />
-      <div className="visual-sec__bottom">
+      <SplitLine as="div" className="visual-sec__bottom">
         <div>
-          <SplitLine anim={false} as="div">
-            A New 【Free to Try】 Font
-          </SplitLine>
-          <SplitLine anim={false} as="div">
-            by Francesca Bolognini & Mathieu Desjardins
-          </SplitLine>
+          <div>A New 【Free to Try】 Font</div>
+          <div>by Francesca Bolognini & Mathieu Desjardins</div>
         </div>
         <div>
-          <SplitLine anim={false} as="div">
-            Available exclusively at
-          </SplitLine>
-          <SplitLine anim={false} as="a">
-            pangrampangram.com
-          </SplitLine>
+          <div>Available exclusively at</div>
+          <a>pangrampangram.com</a>
         </div>
-      </div>
+      </SplitLine>
     </section>
   );
 };

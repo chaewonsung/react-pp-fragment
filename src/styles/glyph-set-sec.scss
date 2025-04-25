@@ -1,6 +1,5 @@
-
 .glyph-set-sec {
-  --glyph-set-header-height: 4rem;
+  --glyph-set-header-height: 5rem;
   padding-inline: 0;
 
   &__header {
@@ -12,19 +11,24 @@
   }
 
   .select-box {
+    --padding: 0 1em;
     position: relative;
     width: 50%;
-    height: 5rem;
-    line-height: 5rem;
+    height: var(--glyph-set-header-height);
+    line-height: var(--glyph-set-header-height);
 
     > button {
       border-bottom: 0;
+    }
+
+    ul {
+      border-top: 1px solid white;
     }
   }
 
   &__content {
     --fw: 200;
-    
+
     display: flex;
     border-bottom: 1px solid white;
     font-weight: var(--fw);

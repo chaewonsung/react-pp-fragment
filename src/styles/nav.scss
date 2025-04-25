@@ -97,6 +97,14 @@
     li:nth-child(6)::before {
       content: '⑥';
     }
+
+    li {
+      display: flex;
+    }
+
+    a:hover * {
+      text-decoration: underline;
+    }
   }
 }
 

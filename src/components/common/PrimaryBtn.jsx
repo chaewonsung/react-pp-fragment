@@ -7,9 +7,10 @@ import { SplitChar } from './SplitText';
 const PrimaryBtn = ({
   children,
   white,
-  as: Component = 'a',
+  as = 'a',
   className,
   ref,
+  ...props
 }) => {
   const buttonRef = ref || useRef();
 
@@ -34,7 +35,9 @@ const PrimaryBtn = ({
   );
 
   return (
-    <Component
+    <SplitChar
+      {...props}
+      as={as}
       ref={buttonRef}
       className={classNames(
         'primary-btn',
@@ -44,10 +47,8 @@ const PrimaryBtn = ({
         className
       )}
     >
-      <span className="line-wrapper">
-        <SplitChar>{children}</SplitChar>
-      </span>
-    </Component>
+      {children}
+    </SplitChar>
   );
 };
 

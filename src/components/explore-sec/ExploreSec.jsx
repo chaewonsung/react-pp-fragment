@@ -10,7 +10,6 @@ const ExploreSec = () => {
 
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
       const exploreRollerTween = gsap.to('.roller-inner', {
         yPercent: 100,
         duration: () => gsap.utils.random(1, 3),
@@ -62,7 +61,7 @@ const ExploreSec = () => {
           trigger: containerRef.current,
           start: 'top top',
           endTrigger: '.explore-sec__randomize-text',
-          end: 'bottom bottom',
+          end: '50% bottom',
           scrub: 1,
           onUpdate: ({ progress }) => {
             if (progress >= 0.3 && exploreRollerTween.progress() === 0) {
@@ -71,66 +70,6 @@ const ExploreSec = () => {
           },
         },
       });
-
-      /* Randomize Text */
-      const $randomizeTextButton = document.querySelector(
-        '.randomize-text__btn'
-      );
-
-      mm.add(
-        { isNotMobile: '(min-width: 769px)', isMobile: '(max-width: 768px)' },
-        (context) => {
-          let { isNotMobile, isMobile } = context.conditions;
-
-          const keyframes = isMobile
-            ? [
-                {
-                  fontWeight: 'random(100,900,100)',
-                  ease: 'power2.inOut',
-                  delay: 3,
-                  duration: 1,
-                },
-              ]
-            : [
-                {
-                  x: (i, target) => {
-                    return `random(0,${target.offsetLeft * -1})`;
-                  },
-                  duration: 1,
-                  delay: 3,
-                  ease: 'power2.inOut',
-                },
-                {
-                  fontWeight: 'random(100,900,100)',
-                  ease: 'power2.inOut',
-                  delay: -0.5,
-                  duration: 1,
-                },
-              ];
-
-          const randomizeTextTween = gsap
-            .to('.randomize-text__result .item', {
-              keyframes,
-              repeat: -1,
-              repeatRefresh: true,
-              scrollTrigger: {
-                trigger: '.explore-sec__randomize-text',
-                toggleActions: 'play pause play pause',
-              },
-            })
-            .progress(1);
-
-          $randomizeTextButton.addEventListener('click', () => {
-            if (randomizeTextTween.progress() < 0.7) {
-              randomizeTextTween.progress(0.7);
-            }
-          });
-
-          return () => {
-            gsap.set('.randomize-text__result .item', { x: 0 });
-          };
-        }
-      );
     },
     { scope: containerRef }
   );
@@ -162,9 +101,7 @@ const ExploreSec = () => {
         </div>
       </div>
       <div className="space"></div>
-      <div className="explore-sec__randomize-text">
-        <RandomizeText />
-      </div>
+      <RandomizeText />
       <div className="space"></div>
     </section>
   );

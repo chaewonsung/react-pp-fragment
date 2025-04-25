@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import '@/styles/footer';
-import { SplitLine } from '../common/SplitText';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import AnimatedLineWrapper from '../common/AnimatedLineWrapper';
 
 const Footer = () => {
   const containerRef = useRef();
@@ -32,52 +32,48 @@ const Footer = () => {
           <div className="credits__typeface">
             <h3 className="observe">Typeface</h3>
             <div className="paras">
-              <SplitLine>
+              <AnimatedLineWrapper>
                 PP Fragment is born from vintage lettering and signs, bridging
                 19th-century letterforms and contemporary typography ● Pangram
                 Pangram’s 35th release uses the latest technology, gracefully
                 oscillating between an elegant, highly contrasted Serif face, a
                 revival mid-serif called Glare, and a strong Sans, each with
                 distinct features yet perfectly complementary.
-              </SplitLine>
-              <SplitLine>
+              </AnimatedLineWrapper>
+              <AnimatedLineWrapper>
                 It comes in 4 preset cuts, Sans, Serif, Glare, and Text, each
                 with unique personalities and quirks. Each weight counts 581
                 glyphs with plenty of alternate symbols to achieve the
                 best-desired result for your next design.
-              </SplitLine>
-              <SplitLine>
+              </AnimatedLineWrapper>
+              <AnimatedLineWrapper>
                 Its power and versatility also comes from its 32 very distinct
                 and unique weights! These weights were carefully crafted and cut
                 for maximum breath of ability ▲ PP Fragment doesn’t disappoint
                 and will surely be one of your best tools in your next design
                 endeavour.
-              </SplitLine>
+              </AnimatedLineWrapper>
             </div>
           </div>
           <div className="credits__visuals">
             <h3 className="observe">Visuals</h3>
-            <div className="line-animation-trigger">
-              <SplitLine>
-                This (awesome) website—courtesy of Locomotive. Our philosophy is
-                built on people who love creating, learning and growing
-                together. A team with ties that transcend the workplace.
-              </SplitLine>
-              <span>
+            <AnimatedLineWrapper className="line-animation-trigger">
+              This (awesome) website—courtesy of Locomotive. Our philosophy is
+              built on people who love creating, learning and growing together.
+              A team with ties that transcend the workplace.
+              <span className="mt">
                 Visual Artist <a href="">@barthur</a>
               </span>
-            </div>
+            </AnimatedLineWrapper>
           </div>
         </div>
       </div>
       <div className="footer__copyright" ref={containerRef}>
         <span>Ω</span>
-        <SplitLine as="div" anim={false}>
-          Copyright &copy; 2022 Pangram Pangram Foundry
-        </SplitLine>
-        <SplitLine as="div" anim={false}>
-          Website by Locomotive
-        </SplitLine>
+        <AnimatedLineWrapper as="div">
+          <div>Copyright &copy; 2022 Pangram Pangram Foundry</div>
+          <div>Website by Locomotive</div>
+        </AnimatedLineWrapper>
       </div>
     </footer>
   );

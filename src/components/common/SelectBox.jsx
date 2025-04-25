@@ -2,15 +2,11 @@ import classNames from 'classnames';
 import PropTypes, { checkPropTypes } from 'prop-types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 
-const SelectBox = ({ defaultOption, options, handleSelect }) => {
+const SelectBox = ({ defaultOption, options, handleSelect, ...props }) => {
   const [selectedOption, setSelectedOption] = useState(
     defaultOption || options[0]?.option || options[0]
   );
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleToggle = useCallback(() => {
-    setIsOpen((prev) => !prev);
-  }, []);
 
   useEffect(() => {
     checkPropTypes(
@@ -23,10 +19,11 @@ const SelectBox = ({ defaultOption, options, handleSelect }) => {
 
   return (
     <div
-      className={classNames('select-box', { open: isOpen })}
-      onClick={handleToggle}
+      {...props}
+      className={classNames(props.className, 'select-box', { open: isOpen })}
+      onClick={() => setIsOpen((prev) => !prev)}
     >
-      <button>
+      <button type="button">
         <span className="select-box__selected-option">{selectedOption}</span>
         <span className="arrow">↓</span>
       </button>
@@ -51,7 +48,7 @@ const Options = memo(({ setSelectedOption, handleSelect, options }) => {
     <ul onClick={handleClick}>
       {options.map((opt) => (
         <li key={opt?.option || opt}>
-          <button {...opt?.props}>
+          <button {...opt?.props} type="button">
             {typeof opt === 'string' ? opt : opt.option}
           </button>
         </li>

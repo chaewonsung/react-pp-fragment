@@ -19,6 +19,9 @@ const FontSamplerSec = () => {
 const Textarea = () => {
   const [settings] = useContext(SettingsContext);
 
+  console.log(settings);
+  
+
   const style = {
     fontFamily: `var(--font-${settings.fontFamily})`,
     fontSize: settings.fontSize + 'px',

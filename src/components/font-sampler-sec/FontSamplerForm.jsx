@@ -1,101 +1,138 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import { FONT_FAMILY } from '../../data';
 import PrimaryBtn from '../common/PrimaryBtn';
-import { toCamelCase, toConstant } from '../../utils/changeNamingConvention';
-import { SettingsContext } from '../../contexts/font-sampler-sec';
+import { initialState, SettingsContext } from '../../contexts/font-sampler-sec';
+import SelectBox from '../common/SelectBox';
 
-const FontSamplerForm = () => {
-  return (
-    <form className="font-sampler-sec__form">
-      <div className="font-setting">
-        <div className="label">Font</div>
-        <div className="no-mobile">
-          {FONT_FAMILY.map((ff) => (
-            <RadioButton key={ff} label={ff} />
-          ))}
-        </div>
-      </div>
-      {RANGE_SETTING_DATA.map((props) => (
-        <RangeSetting key={props.label} {...props} />
-      ))}
-    </form>
-  );
-};
-
-const RadioButton = ({ label }) => {
-  return (
-    <>
-      <input type="radio" name="fontFamily" id={label} />
-      <PrimaryBtn as="label" htmlFor={label}>
-        {label}
-      </PrimaryBtn>
-    </>
-  );
-};
-
-const RANGE_SETTING_DATA = [
-  {
-    label: 'size',
-    styleProp: 'font size',
+const RANGE_SETTING_DATA = {
+  size: {
+    legend: 'size',
+    styleProp: 'fontSize',
+    actionType: 'FONT_SIZE',
     min: 10,
+    max: initialState.fontSize * 2,
     unit: 'pt',
   },
-  {
-    label: 'weight',
-    styleProp: 'font weight',
+  weight: {
+    legend: 'weight',
+    styleProp: 'fontWeight',
+    actionType: 'FONT_WEIGHT',
     min: 100,
     max: 900,
     unit: 'pt',
   },
-  {
-    label: 'letter spacing',
-    styleProp: 'letter spacing',
+  letterSpacing: {
+    legend: 'letter spacing',
+    styleProp: 'letterSpacing',
+    actionType: 'LETTER_SPACING',
     min: -10,
     max: 10,
     unit: '%',
   },
-  {
-    label: 'line height',
-    styleProp: 'line height',
+  lineHeight: {
+    legend: 'line height',
+    styleProp: 'lineHeight',
+    actionType: 'LINE_HEIGHT',
     unit: 'pt',
   },
-];
+};
 
-const RangeSetting = ({ label, styleProp, min, max, unit }) => {
+const FontSamplerForm = () => {
+  return (
+    <form className="font-sampler-sec__form">
+      <FontSetting />
+      <SizeSetting />
+      <WeightSetting />
+      <LetterSpacingSetting />
+      <LineHeightSetting />
+    </form>
+  );
+};
+
+const FontSetting = () => {
   const [settings, dispatch] = useContext(SettingsContext);
 
-  const id = useRef(toCamelCase(label));
-  const actionType = useRef(`SET_${toConstant(styleProp)}`);
-  const camelStyleProp = useRef(toCamelCase(styleProp));
-  const defaultValue = useRef(settings[camelStyleProp.current]);
-
   const handleChange = useCallback((e) => {
-    dispatch({ type: actionType.current, payload: e.target.value });
+    dispatch({ type: 'SET_FONT_FAMILY', payload: e.target.value });
   }, []);
 
-  if (label === 'size') {
-    max = defaultValue.current * 2;
-  } else if (label === 'line height') {
-    min = settings['fontSize'];
-    max = min * 2;
-  }
+  return (
+    <fieldset className="font-setting">
+      <legend>Font</legend>
+      <div className="radios">
+        {FONT_FAMILY.map((ff) => (
+          <React.Fragment key={ff}>
+            <input
+              type="radio"
+              id={ff}
+              name="font"
+              value={ff}
+              checked={settings.fontFamily === ff}
+              onChange={handleChange}
+            />
+            <PrimaryBtn as="label" htmlFor={ff}>
+              {ff}
+            </PrimaryBtn>
+          </React.Fragment>
+        ))}
+      </div>
+      <FontSelectBox />
+    </fieldset>
+  );
+};
+
+const FontSelectBox = () => {
+  const [_, dispatch] = useContext(SettingsContext);
+  const handleSelect = useCallback((target) => {
+    dispatch({ type: 'SET_FONT_FAMILY', payload: target.textContent });
+  }, []);
+  return <SelectBox options={[...FONT_FAMILY]} handleSelect={handleSelect} />;
+};
+
+const SizeSetting = () => {
+  return <RangeSetting {...RANGE_SETTING_DATA.size} />;
+};
+
+const WeightSetting = () => {
+  return <RangeSetting {...RANGE_SETTING_DATA.weight} />;
+};
+
+const LetterSpacingSetting = () => {
+  return <RangeSetting {...RANGE_SETTING_DATA.letterSpacing} />;
+};
+
+const LineHeightSetting = () => {
+  const [settings] = useContext(SettingsContext);
+  const min = settings.fontSize;
+  const max = min * 2;
+  return (
+    <RangeSetting {...RANGE_SETTING_DATA.lineHeight} min={min} max={max} />
+  );
+};
+
+const RangeSetting = ({ legend, styleProp, actionType, min, max, unit }) => {
+  const [settings, dispatch] = useContext(SettingsContext);
+
+  const id = legend.split(' ').join('-');
+  const value = settings[styleProp];
+
+  const handleChange = useCallback((e) => {
+    dispatch({ type: `SET_${actionType}`, payload: e.target.value });
+  }, []);
 
   return (
-    <div key={label}>
-      <label htmlFor={id.current}>{label}</label>
+    <fieldset>
+      <legend>{legend}</legend>
       <input
         type="range"
-        id={id.current}
+        id={id}
         min={min}
         max={max}
-        value={settings[camelStyleProp.current]}
+        value={value}
         onChange={handleChange}
       />
-      <output htmlFor={id.current}>
-        {settings[camelStyleProp.current]}
-        {unit}
-      </output>
-    </div>
+      <output htmlFor={id}>{`${value}${unit}`}</output>
+    </fieldset>
   );
 };
 

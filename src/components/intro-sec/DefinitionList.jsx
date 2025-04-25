@@ -1,5 +1,5 @@
 import React from 'react';
-import SplitText, { SplitLine } from '../common/SplitText';
+import AnimatedLineWrapper from '../common/AnimatedLineWrapper';
 
 const DATA = {
   ['Styles']: '4 Cuts x 9 Styles with 581 Glyphs each',
@@ -11,14 +11,14 @@ const DATA = {
 
 const DefinitionList = () => {
   return (
-    <dl className="observe">
+    <AnimatedLineWrapper as="dl" className="observe">
       {Object.keys(DATA).map((key) => (
         <div key={key}>
-          <SplitLine as="dt">{key}</SplitLine>
-          <SplitLine as="dd">{DATA[key]}</SplitLine>
+          <dt>{key}</dt>
+          <dd>{DATA[key]}</dd>
         </div>
       ))}
-    </dl>
+    </AnimatedLineWrapper>
   );
 };
 

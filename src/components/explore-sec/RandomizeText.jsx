@@ -1,15 +1,85 @@
-import React from 'react';
+import React, { useImperativeHandle, useRef } from 'react';
 import PrimaryBtn from '../common/PrimaryBtn';
 import { SplitChar } from '../common/SplitText';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const RandomizeText = () => {
+  const containerRef = useRef();
+  const resultRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  useGSAP(
+    (_, contextSafe) => {
+      const mm = gsap.matchMedia();
+
+      const setSloganAnimPlayState = (play) =>
+        gsap.set('.randomize-text__slogan .text-wrapper', {
+          animationPlayState: play ? 'running' : 'paused',
+        });
+
+      mm.add(
+        { isNotMobile: '(min-width: 769px)', isMobile: '(max-width: 768px)' },
+        (context) => {
+          const { isNotMobile } = context.conditions;
+          const repeatDelay = isNotMobile ? 2 : 0;
+          const fwDelay = isNotMobile ? 0 : 2;
+          const xDelay = 0.2;
+
+          const randomizeTextTl = gsap
+            .timeline({
+              repeat: -1,
+              repeatRefresh: true,
+              repeatDelay,
+              scrollTrigger: {
+                trigger: containerRef.current,
+                toggleActions: 'play pause play pause',
+                endTrigger: containerRef.current.nextElementSibling,
+                onEnter: () => setSloganAnimPlayState(true),
+                onLeave: () => setSloganAnimPlayState(false),
+                onEnterBack: () => setSloganAnimPlayState(true),
+                onLeaveBack: () => setSloganAnimPlayState(false),
+              },
+            })
+            .set('.randomize-text__result .item-wrapper', {
+              '--fw': 'random(100, 900, 100)',
+              delay: fwDelay,
+            });
+
+          if (isNotMobile) {
+            randomizeTextTl.to('.randomize-text__result .item', {
+              x: (i) => resultRef.current.getRandomRange(i),
+              ease: 'power2.inOut',
+              duration: 1,
+              delay: xDelay,
+            });
+          }
+
+          const handleButtonClick = contextSafe(() => {
+            randomizeTextTl.invalidate().time(isNotMobile ? xDelay : fwDelay);
+          });
+
+          buttonRef.current.addEventListener('click', handleButtonClick);
+
+          return () => {
+            gsap.set('.randomize-text__result .item', { clearProps: 'all' });
+            buttonRef.current.removeEventListener('click', handleButtonClick);
+          };
+        }
+      );
+    },
+    { scope: containerRef }
+  );
+
   return (
-    <div className="randomize-text">
-      <Slogan />
-      <PrimaryBtn white className="randomize-text__btn">
-        randomize
-      </PrimaryBtn>
-      <Result />
+    <div className="explore-sec__randomize-text" ref={containerRef}>
+      <div className="randomize-text">
+        <Slogan />
+        <PrimaryBtn white className="randomize-text__btn" ref={buttonRef}>
+          randomize
+        </PrimaryBtn>
+        <Result resultRef={resultRef} />
+      </div>
     </div>
   );
 };
@@ -18,12 +88,12 @@ const Slogan = () => {
   return (
     <div className="randomize-text__slogan">
       <div className="text-wrapper">
-        <span className="unlimited">unlimited combinations</span>
-        <span className="and-so-many">and so many possibilities</span>
-        <span className="unlimited">unlimited combinations</span>
-        <span className="and-so-many">and so many possibilities </span>
-        <span className="unlimited">unlimited combinations</span>
-        <span className="and-so-many">and so many possibilities</span>
+        {[...new Array(4)].map((_, i) => (
+          <React.Fragment key={i}>
+            <span className="unlimited">unlimited combinations</span>
+            <span className="and-so-many">and so many possibilities</span>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );
@@ -40,13 +110,57 @@ const DATA = [
   { text: 'are impossible', ff: 'text' },
 ];
 
-const Result = () => {
+const Result = ({ resultRef }) => {
+  const containerRef = useRef(null);
+  const itemWrapperArrRef = useRef([]);
+  const fakeItemArrRef = useRef([]);
+
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({
+        scrollTrigger: containerRef.current,
+        once: true,
+      });
+
+      itemWrapperArrRef.current.forEach((itemWrapper, i) => {
+        const q = gsap.utils.selector(itemWrapper);
+
+        tl.from(q('.char'), { yPercent: 100, stagger: 0.04 }, i * 0.1);
+      });
+    },
+    { scope: containerRef }
+  );
+
+  useImperativeHandle(resultRef, () => ({
+    getRandomRange: (i) => {
+      const left = fakeItemArrRef.current[i].offsetLeft * -1;
+      const center =
+        (fakeItemArrRef.current[i].parentNode.offsetWidth / 2 -
+          fakeItemArrRef.current[i].offsetWidth / 2) *
+        -1;
+      const right = 0;
+
+      return `random([${left}, ${center}, ${right}])`;
+    },
+  }));
+
   return (
-    <div className="randomize-text__result">
-      {DATA.map(({ text, ff }) => (
-        <div key={text} className="item-wrapper">
+    <div className="randomize-text__result" ref={containerRef}>
+      {DATA.map(({ text, ff }, i) => (
+        <div
+          key={text}
+          className={`item-wrapper ${ff}`}
+          ref={(el) => (itemWrapperArrRef.current[i] = el)}
+        >
+          <div
+            className="fake-item"
+            aria-hidden="true"
+            ref={(el) => (fakeItemArrRef.current[i] = el)}
+          >
+            {text}
+          </div>
           <div className="item">
-            <SplitChar className={ff}>{text}</SplitChar>
+            <SplitChar className="char-wrapper">{text}</SplitChar>
             <div className="desc">
               <div>PP Fragment</div>
               <div>Text Bold</div>

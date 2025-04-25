@@ -2,36 +2,34 @@ import React, { createContext, useReducer } from 'react';
 
 const initialState = {
   fontFamily: 'sans',
+  fontSize: ~~(innerWidth * 0.1),
   fontWeight: 400,
   letterSpacing: 0,
-  fontSize: ~~(innerWidth * 0.1),
   lineHeight: ~~(innerWidth * 0.1 * 1.3), // fontSize * 1.3
-  get height() {
-    return this.lineHeight * 3;
-  },
 };
 
 function reducer(state, action) {
   switch (action.type) {
     case 'SET_FONT_FAMILY':
       return { ...state, fontFamily: action.payload };
-    case 'SET_FONT_WEIGHT':
-      return { ...state, fontWeight: action.payload };
-    case 'SET_LETTER_SPACING':
-      return { ...state, letterSpacing: action.payload };
-    case 'SET_LINE_HEIGHT':
-      return { ...state, lineHeight: action.payload };
     case 'SET_FONT_SIZE':
       return {
         ...state,
         fontSize: action.payload,
         lineHeight: ~~(action.payload * 1.3),
       };
-    case 'INITAILIZE': {
-      const fontSize = ~~(innerWidth * 0.1);
-      const lineHeight = ~~(fontSize * 1.3);
-      return { ...state, fontSize, lineHeight };
-    }
+    case 'SET_FONT_WEIGHT':
+      return { ...state, fontWeight: action.payload };
+    case 'SET_LETTER_SPACING':
+      return { ...state, letterSpacing: action.payload };
+    case 'SET_LINE_HEIGHT':
+      return { ...state, lineHeight: action.payload };
+    case 'INITAILIZE':
+      return {
+        ...state,
+        fontSize: initialState.fontSize,
+        lineHeight: initialState.lineHeight,
+      };
     default:
       return state;
   }
@@ -51,5 +49,5 @@ const FontSamplerSecContextProvider = ({ children }) => {
   );
 };
 
-export { SettingsContext };
+export { SettingsContext, initialState };
 export default FontSamplerSecContextProvider;
