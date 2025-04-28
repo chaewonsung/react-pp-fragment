@@ -76,7 +76,7 @@ const NavigationSec = () => {
   );
 
   return (
-    <section className="navigation-sec" ref={containerRef}>
+    <section className="navigation-sec" ref={containerRef} id="fragment-in-use">
       <div className="navigation-sec__sticky">
         <div className="navigation-sec__bg">
           {[...new Array(6)].map((_, i) => (

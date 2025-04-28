@@ -99,7 +99,7 @@ const LnbList = memo(({ lnbListRef }) => {
         'special characters',
       ].map((v) => (
         <li key={v}>
-          <Link to={`#${v.split().join('-')}`}>{v}</Link>
+          <Link to={`#${v.split(' ').join('-')}`}>{v}</Link>
         </li>
       ))}
     </SplitLine>

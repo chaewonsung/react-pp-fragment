@@ -1,17 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
-import SplitLine from './SplitText';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import useSplitLine from '../../hooks/useSplitLine';
+import SplitLine from './SplitLine';
 
-const AnimatedLineWrapper = ({ children, externalTriggerRef, ...props }) => {
+const AnimatedLineWrapper = ({
+  children,
+  externalTriggerRef,
+  as = 'p',
+  ...props
+}) => {
   const containerRef = useRef(null);
-  const [state, setState] = useState();
+  const [html, cleanup] = useSplitLine(containerRef);
 
   useGSAP(
     () => {
-      const container = containerRef.current.node;
-      if (!container) return;
+      if (!html) return;
 
+      const container = containerRef.current;
       const q = gsap.utils.selector(container);
 
       gsap.fromTo(
@@ -19,21 +25,21 @@ const AnimatedLineWrapper = ({ children, externalTriggerRef, ...props }) => {
         { yPercent: 100 },
         {
           yPercent: 0,
-          stagger: 0.06,
+          stagger: 0.1,
           scrollTrigger: {
             trigger: externalTriggerRef?.current || container,
             once: true,
             start: '50% bottom',
-            onLeave: containerRef.current.cleanup,
+            onLeave: cleanup,
           },
         }
       );
     },
-    { dependencies: [containerRef.current] }
+    { dependencies: [html] }
   );
 
   return (
-    <SplitLine {...props} ref={containerRef} setParentState={setState}>
+    <SplitLine {...props} html={html} ref={containerRef} as={as}>
       {children}
     </SplitLine>
   );

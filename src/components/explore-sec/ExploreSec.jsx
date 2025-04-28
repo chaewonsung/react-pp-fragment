@@ -23,7 +23,7 @@ const ExploreSec = () => {
           yPercent: [-25, -100, 15],
           rotate: [20, -30, -45],
         },
-        to: { xPercent: [15, -15, -15], yPercent: [-100, 60, 60] },
+        to: { xPercent: [25, -25, -25], yPercent: [-100, 60, 60] },
       };
 
       gsap.set('.explore-sec__bg img', {
@@ -38,13 +38,13 @@ const ExploreSec = () => {
             rotate: (i) => exploreBgTweenConfig.from.rotate[i],
             opacity: 0,
           },
-          '25%': {
+          '45%': {
             yPercent: 0,
             xPercent: 0,
             rotate: 0,
             opacity: 1,
           },
-          '75%': {
+          '55%': {
             yPercent: 0,
             xPercent: 0,
             rotate: 0,
@@ -61,7 +61,7 @@ const ExploreSec = () => {
           trigger: containerRef.current,
           start: 'top top',
           endTrigger: '.explore-sec__randomize-text',
-          end: '50% bottom',
+          end: 'bottom bottom',
           scrub: 1,
           onUpdate: ({ progress }) => {
             if (progress >= 0.3 && exploreRollerTween.progress() === 0) {
@@ -75,7 +75,7 @@ const ExploreSec = () => {
   );
 
   return (
-    <section ref={containerRef} className="explore-sec">
+    <section ref={containerRef} className="explore-sec" id="from-sans-to-serif">
       <div className="explore-sec__intro">
         <div className="explore-sec__bg">
           <img src={require('@/assets/images/a-1.png')} alt="" />

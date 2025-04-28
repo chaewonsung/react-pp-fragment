@@ -35,7 +35,10 @@
     gap: 30px;
     text-wrap: balance;
     padding: var(--g-padding);
-   
+
+    > div:nth-child(2) {
+      text-align: right;
+    }
   }
 }
 

@@ -62,18 +62,18 @@ const App = () => {
             },
             duration: 3,
           },
-          { scale: 0.85, duration: 0.8, delay: -1, ease: 'power2.inOut' },
+          { scale: 0.85, duration: 0.8, delay: -1, ease: 'power3.in' },
           {
             x: (i) => toPX(loadAnimTlConfig.x[i] + 'vw'),
             y: (i) => toPX(loadAnimTlConfig.y[i] + 'vh'),
             rotate: (i) => loadAnimTlConfig.rotate[i],
             ease: 'power3.out',
-            duration: 2,
+            duration: 1.5,
           },
         ],
       })
       .to('.visual-sec__bg > div', {
-        y: (i) => (i % 2 ? '+=50' : '-=50'),
+        yPercent: (i) => (i % 2 ? '+=10' : '-=10'),
         repeat: -1,
         yoyo: true,
         ease: 'none',

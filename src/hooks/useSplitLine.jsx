@@ -1,11 +1,5 @@
 import { debounce } from 'lodash';
-import React, {
-  useEffect,
-  useImperativeHandle,
-  useLayoutEffect,
-  useReducer,
-  useRef,
-} from 'react';
+import { useLayoutEffect, useReducer, useRef } from 'react';
 import { flushSync } from 'react-dom';
 
 const reducer = (state, action) => {
@@ -19,34 +13,12 @@ const reducer = (state, action) => {
   }
 };
 
-const SplitLine = ({
-  children,
-  as: Tag = 'p',
-  splitChar = false,
-  ref,
-  setParentState,
-  ...props
-}) => {
-  const initialContainerRef = useRef(null);
-  const containerRef = useRef(null);
-  const cleanupRef = useRef(() => {});
+const useSplitLine = (containerRef, splitChar = false) => {
   const [html, dispatch] = useReducer(reducer, '');
-
-  useEffect(() => {
-    if (setParentState) setParentState(html);
-  }, [html]);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      cleanup: cleanupRef.current,
-      node: containerRef.current,
-    }),
-    [cleanupRef.current, containerRef.current]
-  );
+  const cleanupRef = useRef(() => {});
 
   useLayoutEffect(() => {
-    const container = initialContainerRef.current;
+    const container = containerRef.current;
     if (!container) return;
 
     const range = document.createRange();
@@ -109,7 +81,7 @@ const SplitLine = ({
         for (const child of children) {
           if (child.nodeType === Node.TEXT_NODE) {
             const text = child.textContent;
-            const words = text.match(/.*?\s|.+$/g);
+            const words = text.match(/.*?[\s-]|.+$/g);
             let index = 0;
 
             for (let i = 0; i < words.length; i++) {
@@ -191,49 +163,7 @@ const SplitLine = ({
     return cleanup;
   }, []);
 
-  return (
-    <>
-      {html ? (
-        <Tag
-          dangerouslySetInnerHTML={{ __html: html }}
-          ref={containerRef}
-          {...props}
-        />
-      ) : (
-        <Tag
-          {...props}
-          style={{
-            ...props.style,
-            wordBreak: 'keep-all',
-          }}
-          ref={initialContainerRef}
-        >
-          {children}
-        </Tag>
-      )}
-    </>
-  );
+  return [html, cleanupRef.current];
 };
 
-const SplitChar = ({ as: Tag = 'div', children, wrap = true, ...props }) => {
-  const newChildren = children.split('').map((c, i) => (
-    <span key={i} className="char" style={{ display: 'inline-block' }}>
-      {c === ' ' ? '\u00A0' : c}
-    </span>
-  ));
-
-  return (
-    <Tag {...props}>
-      {wrap ? (
-        <span className="line-wrapper" style={{ display: 'inline-block' }}>
-          {newChildren}
-        </span>
-      ) : (
-        newChildren
-      )}
-    </Tag>
-  );
-};
-
-export { SplitChar };
-export default SplitLine;
+export default useSplitLine;

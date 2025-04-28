@@ -3,6 +3,7 @@ import PrimaryBtn from '../common/PrimaryBtn';
 import { SplitChar } from '../common/SplitText';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { throttle } from 'lodash';
 
 const RandomizeText = () => {
   const containerRef = useRef();
@@ -13,18 +14,20 @@ const RandomizeText = () => {
     (_, contextSafe) => {
       const mm = gsap.matchMedia();
 
-      const setSloganAnimPlayState = (play) =>
-        gsap.set('.randomize-text__slogan .text-wrapper', {
-          animationPlayState: play ? 'running' : 'paused',
-        });
-
       mm.add(
         { isNotMobile: '(min-width: 769px)', isMobile: '(max-width: 768px)' },
         (context) => {
           const { isNotMobile } = context.conditions;
           const repeatDelay = isNotMobile ? 2 : 0;
-          const fwDelay = isNotMobile ? 0 : 2;
+          const delay = isNotMobile ? 0 : 2;
+          const xDuration = 1;
           const xDelay = 0.2;
+          const fwDuration = 0.5;
+          const fwDelay = xDuration - fwDuration;
+
+          gsap.set('.randomize-text__result .item', {
+            transition: `font-weight ${fwDuration}s ${fwDelay}s`,
+          });
 
           const randomizeTextTl = gsap
             .timeline({
@@ -35,28 +38,31 @@ const RandomizeText = () => {
                 trigger: containerRef.current,
                 toggleActions: 'play pause play pause',
                 endTrigger: containerRef.current.nextElementSibling,
-                onEnter: () => setSloganAnimPlayState(true),
-                onLeave: () => setSloganAnimPlayState(false),
-                onEnterBack: () => setSloganAnimPlayState(true),
-                onLeaveBack: () => setSloganAnimPlayState(false),
+                onToggle: ({ isActive }) => {
+                  gsap.set('.randomize-text__slogan .text-wrapper', {
+                    animationPlayState: isActive ? 'running' : 'paused',
+                  });
+                },
               },
             })
             .set('.randomize-text__result .item-wrapper', {
               '--fw': 'random(100, 900, 100)',
-              delay: fwDelay,
+              delay,
             });
 
           if (isNotMobile) {
             randomizeTextTl.to('.randomize-text__result .item', {
               x: (i) => resultRef.current.getRandomRange(i),
               ease: 'power2.inOut',
-              duration: 1,
+              duration: xDuration,
               delay: xDelay,
             });
           }
 
+          randomizeTextTl.time(randomizeTextTl.duration());
+
           const handleButtonClick = contextSafe(() => {
-            randomizeTextTl.invalidate().time(isNotMobile ? xDelay : fwDelay);
+            randomizeTextTl.invalidate().time(isNotMobile ? xDelay : delay);
           });
 
           buttonRef.current.addEventListener('click', handleButtonClick);

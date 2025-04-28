@@ -115,6 +115,7 @@
       position: relative;
       display: flex;
       justify-content: flex-end;
+      font-weight: var(--fw, 300);
 
       &:not(:nth-child(4), :nth-child(5)) {
         grid-column: 1/-1;
@@ -126,17 +127,12 @@
       top: 0;
       right: 0;
       visibility: hidden;
-      font-weight: var(--fw, 300);
     }
 
     .item {
       position: relative;
       white-space: nowrap;
 
-      .char-wrapper {
-        font-weight: var(--fw, 300);
-        transition: font-weight 0.5s 0.7s;
-      }
       .desc {
         font-size: 30%;
         position: absolute;
