@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { getGsapCharTween } from '../../utils/gsapTween';
-import SplitLine from '../common/SplitText';
+import SplitLine from '../common/SplitLine';
+import useSplitLine from '../../hooks/useSplitLine';
 
 const CARD_DATA = [
   { id: 1, header: ['①', 'BUY'], text: 'buy PP® Fragment' },
@@ -27,36 +28,17 @@ const CardList = () => {
 };
 
 const Card = ({ header, text }) => {
-  const containerRef = useRef();
-  const textRef = useRef();
-  const [_, setState] = useState();
+  const containerRef = useRef(null);
+  const tlRef = useRef(gsap.timeline({ paused: true }));
 
-  useGSAP(
-    (_, contextSafe) => {
-      if (!textRef.current.node) return;
+  useGSAP((_, contextSafe) => {
+    const handleMouseenter = contextSafe(() => tlRef.current.restart());
 
-      const lines = [...textRef.current.node.children];
-      const tl = gsap.timeline({ paused: true });
-
-      lines.forEach((line, i) => {
-        const q = gsap.utils.selector(line);
-        const tween = getGsapCharTween(q('.char'));
-        tl.add(tween, i * 0.08);
-      });
-
-      const handleMouseenter = contextSafe(() => tl.restart());
-
-      containerRef.current.addEventListener('mouseenter', handleMouseenter);
-
-      return () => {
-        containerRef.current.removeEventListener(
-          'mouseenter',
-          handleMouseenter
-        );
-      };
-    },
-    { dependencies: [textRef.current], scope: containerRef }
-  );
+    containerRef.current.addEventListener('mouseenter', handleMouseenter);
+    return () => {
+      containerRef.current.removeEventListener('mouseenter', handleMouseenter);
+    };
+  });
 
   return (
     <a className="card" href="/" ref={containerRef}>
@@ -64,17 +46,40 @@ const Card = ({ header, text }) => {
         <span>{header[0]}</span>
         <span>{header[1]}</span>
       </div>
-      <SplitLine
-        as="div"
-        splitChar
-        className="card__text"
-        ref={textRef}
-        setParentState={setState}
-      >
-        {text}
-      </SplitLine>
+      <CardText tlRef={tlRef}>{text}</CardText>
       <div className="card__arrow">→</div>
     </a>
+  );
+};
+
+const CardText = ({ children, tlRef }) => {
+  const containerRef = useRef(null);
+  const [html] = useSplitLine(containerRef, true);
+
+  useGSAP(
+    () => {
+      if (!html) return;
+
+      const lines = [...containerRef.current.children];
+      const tl = tlRef.current;
+
+      lines.forEach((line, i) => {
+        const q = gsap.utils.selector(line);
+        const tween = getGsapCharTween(q('.char'));
+        tl.add(tween, i * 0.08);
+      });
+
+      return () => {
+        tl.remove();
+      };
+    },
+    { dependencies: [html] }
+  );
+
+  return (
+    <SplitLine html={html} ref={containerRef} className="card__text">
+      {children}
+    </SplitLine>
   );
 };
 

@@ -2,18 +2,20 @@ import React, { memo, useContext, useEffect, useRef } from 'react';
 import Link from '../common/Link';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import SplitLine, { SplitChar } from '../common/SplitText';
+import { SplitChar } from '../common/SplitText';
 import { NavContext } from '../../contexts/nav';
+import SplitLine from '../common/SplitLine';
+import useSplitLine from '../../hooks/useSplitLine';
 
 const NavContent = () => {
   const containerRef = useRef(null);
-  const lnbListRef = useRef({});
   const [isOpen] = useContext(NavContext);
   const timelineRef = useRef(null);
+  const linesRef = useRef([]);
 
   const { contextSafe } = useGSAP(
     () => {
-      if (!lnbListRef.current.node) return;
+      if (!isOpen) return;
 
       timelineRef.current = gsap
         .timeline({
@@ -44,7 +46,7 @@ const NavContent = () => {
         )
         .progress(1);
     },
-    { dependencies: [lnbListRef.current], scope: containerRef }
+    { dependencies: [isOpen], scope: containerRef }
   );
 
   useEffect(
@@ -63,7 +65,7 @@ const NavContent = () => {
     >
       <div className="lnb">
         <SplitChar className="lnb__typo">Fragment</SplitChar>
-        <LnbList lnbListRef={lnbListRef} />
+        <LnbList />
         <SplitChar as={Link} className="lnb__get-font">
           Get 〖the font〗
         </SplitChar>
@@ -87,17 +89,22 @@ const NavContent = () => {
   );
 };
 
-const LnbList = memo(({ lnbListRef }) => {
+const LNB_LIST = [
+  'introduction',
+  'from sans to serif',
+  'glyph set',
+  'font sampler',
+  'fragment in use',
+  'special characters',
+];
+
+const LnbList = memo(() => {
+  const containerRef = useRef(null);
+  const [html] = useSplitLine(containerRef);
+
   return (
-    <SplitLine as="ul" className="lnb__list" ref={lnbListRef}>
-      {[
-        'introduction',
-        'from sans to serif',
-        'glyph set',
-        'font sampler',
-        'fragment in use',
-        'special characters',
-      ].map((v) => (
+    <SplitLine html={html} ref={containerRef} as="ul" className="lnb__list">
+      {LNB_LIST.map((v) => (
         <li key={v}>
           <Link to={`#${v.split(' ').join('-')}`}>{v}</Link>
         </li>

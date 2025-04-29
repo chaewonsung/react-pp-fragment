@@ -62,7 +62,21 @@
           background: black;
           border: 1px solid white;
           width: 1.2em;
-          aspect-ratio: 1/1;
+          height: 1.2em;
+          border-radius: 50%;
+          transition: scale 0.2s;
+
+          &:hover {
+            scale: 1.1;
+          }
+        }
+
+        &::-moz-range-thumb {
+          appearance: none;
+          background: black;
+          border: 1px solid white;
+          width: 1.2em;
+          height: 1.2em;
           border-radius: 50%;
           transition: scale 0.2s;
 

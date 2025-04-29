@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import '@/styles/font-sampler-sec';
 import FontSamplerForm from './FontSamplerForm';
-import FontSamplerSecContextProvider, {
-  SettingsContext,
-} from '../../contexts/font-sampler-sec';
+import FontSamplerSecContextProvider from '../../contexts/font-sampler-sec';
+import useFontSamplerStore from '../../store/fontSamplerStore';
+import { useShallow } from 'zustand/shallow';
 
 const FontSamplerSec = () => {
   return (
@@ -17,15 +17,24 @@ const FontSamplerSec = () => {
 };
 
 const Textarea = () => {
-  const [settings] = useContext(SettingsContext);
+  const [fontFamily, fontSize, fontWeight, letterSpacing, lineHeight] =
+    useFontSamplerStore(
+      useShallow((state) => [
+        state.fontFamily,
+        state.fontSize,
+        state.fontWeight,
+        state.letterSpacing,
+        state.lineHeight,
+      ])
+    );
 
   const style = {
-    fontFamily: `var(--font-${settings.fontFamily})`,
-    fontSize: settings.fontSize + 'px',
-    fontWeight: settings.fontWeight,
-    letterSpacing: settings.letterSpacing + 'px',
-    lineHeight: settings.lineHeight + 'px',
-    height: settings.lineHeight * 3 + 'px',
+    fontFamily: `var(--font-${fontFamily})`,
+    fontSize: fontSize + 'px',
+    fontWeight: fontWeight,
+    letterSpacing: letterSpacing + 'px',
+    lineHeight: lineHeight + 'px',
+    height: lineHeight * 3 + 'px',
   };
 
   return (

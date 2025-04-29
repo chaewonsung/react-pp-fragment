@@ -24,12 +24,6 @@ function reducer(state, action) {
       return { ...state, letterSpacing: action.payload };
     case 'SET_LINE_HEIGHT':
       return { ...state, lineHeight: action.payload };
-    case 'INITAILIZE':
-      return {
-        ...state,
-        fontSize: initialState.fontSize,
-        lineHeight: initialState.lineHeight,
-      };
     default:
       return state;
   }

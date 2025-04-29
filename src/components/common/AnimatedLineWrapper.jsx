@@ -25,7 +25,7 @@ const AnimatedLineWrapper = ({
         { yPercent: 100 },
         {
           yPercent: 0,
-          stagger: 0.1,
+          stagger: 0.06,
           scrollTrigger: {
             trigger: externalTriggerRef?.current || container,
             once: true,

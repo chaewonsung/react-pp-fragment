@@ -3,7 +3,6 @@ import PrimaryBtn from '../common/PrimaryBtn';
 import { SplitChar } from '../common/SplitText';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { throttle } from 'lodash';
 
 const RandomizeText = () => {
   const containerRef = useRef();
@@ -22,12 +21,15 @@ const RandomizeText = () => {
           const delay = isNotMobile ? 0 : 2;
           const xDuration = 1;
           const xDelay = 0.2;
-          const fwDuration = 0.5;
-          const fwDelay = xDuration - fwDuration;
 
-          gsap.set('.randomize-text__result .item', {
-            transition: `font-weight ${fwDuration}s ${fwDelay}s`,
-          });
+          if (isNotMobile) {
+            const fwDuration = 0.5;
+            const fwDelay = xDuration + xDelay - fwDuration;
+
+            gsap.set('.randomize-text__result .item', {
+              transition: `font-weight ${fwDuration}s ${fwDelay}s`,
+            });
+          }
 
           const randomizeTextTl = gsap
             .timeline({
@@ -58,8 +60,6 @@ const RandomizeText = () => {
               delay: xDelay,
             });
           }
-
-          randomizeTextTl.time(randomizeTextTl.duration());
 
           const handleButtonClick = contextSafe(() => {
             randomizeTextTl.invalidate().time(isNotMobile ? xDelay : delay);

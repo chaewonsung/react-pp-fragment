@@ -2,7 +2,13 @@ import classNames from 'classnames';
 import PropTypes, { checkPropTypes } from 'prop-types';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 
-const SelectBox = ({ defaultOption, options, handleSelect, ...props }) => {
+const SelectBox = ({
+  defaultOption,
+  options,
+  handleSelect,
+  label,
+  ...props
+}) => {
   const [selectedOption, setSelectedOption] = useState(
     defaultOption || options[0]?.option || options[0]
   );
@@ -23,11 +29,19 @@ const SelectBox = ({ defaultOption, options, handleSelect, ...props }) => {
       className={classNames(props.className, 'select-box', { open: isOpen })}
       onClick={() => setIsOpen((prev) => !prev)}
     >
-      <button type="button">
+      <button
+        type="button"
+        role="combobox"
+        aria-label={label}
+        aria-expanded={isOpen}
+      >
         <span className="select-box__selected-option">{selectedOption}</span>
-        <span className="arrow">↓</span>
+        <span className="arrow" aria-hidden>
+          ↓
+        </span>
       </button>
       <Options
+        selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}
         handleSelect={handleSelect}
         options={options}
@@ -36,26 +50,36 @@ const SelectBox = ({ defaultOption, options, handleSelect, ...props }) => {
   );
 };
 
-const Options = memo(({ setSelectedOption, handleSelect, options }) => {
-  const handleClick = useCallback(({ target }) => {
-    if (!target.matches('button')) return;
+const Options = memo(
+  ({ selectedOption, setSelectedOption, handleSelect, options }) => {
+    const handleClick = useCallback(({ target }) => {
+      if (!target.matches('button')) return;
 
-    setSelectedOption(target.textContent);
-    handleSelect && handleSelect(target);
-  }, []);
+      setSelectedOption(target.textContent);
+      handleSelect && handleSelect(target);
+    }, []);
 
-  return (
-    <ul onClick={handleClick}>
-      {options.map((opt) => (
-        <li key={opt?.option || opt}>
-          <button {...opt?.props} type="button">
-            {typeof opt === 'string' ? opt : opt.option}
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-});
+    return (
+      <ul onClick={handleClick} role="listbox">
+        {options.map((option) => {
+          const opt = option?.option || option;
+          return (
+            <li key={opt}>
+              <button
+                {...option?.props}
+                type="button"
+                role="option"
+                aria-selected={selectedOption === opt}
+              >
+                {opt}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+);
 
 Options.displayName = 'Options';
 

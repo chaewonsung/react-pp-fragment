@@ -33,6 +33,7 @@ const FontSelectBox = () => {
       defaultOption="sans extra light"
       options={options}
       handleSelect={handleSelect}
+      label="select font"
     ></SelectBox>
   );
 };

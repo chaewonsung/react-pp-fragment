@@ -222,18 +222,19 @@ section {
     text-transform: capitalize;
     z-index: 1;
 
-    li {
-      padding: var(--padding, 0.7em 1em);
-      &:hover {
-        background-color: white;
-        color: black;
-      }
-    }
     li + li {
       border-top: 1px solid white;
     }
+
     button {
       width: 100%;
+      padding: var(--padding, 0.7em 1em);
+      &:hover,
+      &:focus {
+        background-color: white;
+        color: black;
+        outline: none;
+      }
     }
   }
 }

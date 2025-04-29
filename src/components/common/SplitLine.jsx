@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import useSplitLine from '../../hooks/useSplitLine';
 
 const SplitLine = ({ html, as: Tag = 'div', ref, children, ...props }) => {
   return (
@@ -15,4 +16,16 @@ const SplitLine = ({ html, as: Tag = 'div', ref, children, ...props }) => {
   );
 };
 
+const SplitLineProcessor = ({ as, children }) => {
+  const containerRef = useRef(null);
+  const [html] = useSplitLine(containerRef);
+
+  return (
+    <SplitLine html={html} ref={containerRef} as={as}>
+      {children}
+    </SplitLine>
+  );
+};
+
+export { SplitLineProcessor };
 export default SplitLine;

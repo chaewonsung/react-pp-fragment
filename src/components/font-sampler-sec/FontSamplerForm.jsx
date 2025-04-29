@@ -1,22 +1,21 @@
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FONT_FAMILY } from '../../data';
 import PrimaryBtn from '../common/PrimaryBtn';
-import { initialState, SettingsContext } from '../../contexts/font-sampler-sec';
 import SelectBox from '../common/SelectBox';
+import { debounce } from 'lodash';
+import useFontSamplerStore from '../../store/fontSamplerStore';
+import { useShallow } from 'zustand/shallow';
 
 const RANGE_SETTING_DATA = {
   size: {
     legend: 'size',
     styleProp: 'fontSize',
-    actionType: 'FONT_SIZE',
     min: 10,
-    max: initialState.fontSize * 2,
     unit: 'pt',
   },
   weight: {
     legend: 'weight',
     styleProp: 'fontWeight',
-    actionType: 'FONT_WEIGHT',
     min: 100,
     max: 900,
     unit: 'pt',
@@ -24,7 +23,6 @@ const RANGE_SETTING_DATA = {
   letterSpacing: {
     legend: 'letter spacing',
     styleProp: 'letterSpacing',
-    actionType: 'LETTER_SPACING',
     min: -10,
     max: 10,
     unit: '%',
@@ -32,7 +30,6 @@ const RANGE_SETTING_DATA = {
   lineHeight: {
     legend: 'line height',
     styleProp: 'lineHeight',
-    actionType: 'LINE_HEIGHT',
     unit: 'pt',
   },
 };
@@ -50,11 +47,11 @@ const FontSamplerForm = () => {
 };
 
 const FontSetting = () => {
-  const [settings, dispatch] = useContext(SettingsContext);
+  const [fontFamily, setFontFamily] = useFontSamplerStore(
+    useShallow((state) => [state.fontFamily, state.actions.setFontFamily])
+  );
 
-  const handleChange = useCallback((e) => {
-    dispatch({ type: 'SET_FONT_FAMILY', payload: e.target.value });
-  }, []);
+  const handleChange = useCallback((e) => setFontFamily(e.target.value), []);
 
   return (
     <fieldset className="font-setting">
@@ -67,7 +64,7 @@ const FontSetting = () => {
               id={ff}
               name="font"
               value={ff}
-              checked={settings.fontFamily === ff}
+              checked={fontFamily === ff}
               onChange={handleChange}
             />
             <PrimaryBtn as="label" htmlFor={ff}>
@@ -82,15 +79,38 @@ const FontSetting = () => {
 };
 
 const FontSelectBox = () => {
-  const [_, dispatch] = useContext(SettingsContext);
-  const handleSelect = useCallback((target) => {
-    dispatch({ type: 'SET_FONT_FAMILY', payload: target.textContent });
-  }, []);
-  return <SelectBox options={[...FONT_FAMILY]} handleSelect={handleSelect} />;
+  const { setFontFamily } = useFontSamplerStore((state) => state.actions);
+
+  const handleSelect = useCallback(
+    (target) => setFontFamily(target.textContent),
+    []
+  );
+  return (
+    <SelectBox
+      options={[...FONT_FAMILY]}
+      handleSelect={handleSelect}
+      label="select font family"
+    />
+  );
 };
 
 const SizeSetting = () => {
-  return <RangeSetting {...RANGE_SETTING_DATA.size} />;
+  const { setFontSize } = useFontSamplerStore((state) => state.actions);
+  const [max, setMax] = useState(~~(innerWidth * 0.1) * 2);
+
+  useEffect(() => {
+    const handleResize = debounce(() => {
+      const newFontSize = ~~(innerWidth * 0.1);
+      setFontSize(newFontSize);
+      setMax(newFontSize * 2);
+    }, 200);
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  return <RangeSetting {...RANGE_SETTING_DATA.size} max={max} />;
 };
 
 const WeightSetting = () => {
@@ -102,22 +122,36 @@ const LetterSpacingSetting = () => {
 };
 
 const LineHeightSetting = () => {
-  const [settings] = useContext(SettingsContext);
-  const min = settings.fontSize;
-  const max = min * 2;
+  const [minMax, setMinMax] = useState({
+    min: ~~(innerWidth * 0.1),
+    max: ~~(innerWidth * 0.1) * 2,
+  });
+
+  useEffect(() => {
+    useFontSamplerStore.subscribe(
+      (state) => state.fontSize,
+      (fontSize) => setMinMax({ min: fontSize, max: fontSize * 2 })
+    );
+  }, []);
   return (
-    <RangeSetting {...RANGE_SETTING_DATA.lineHeight} min={min} max={max} />
+    <RangeSetting
+      {...RANGE_SETTING_DATA.lineHeight}
+      min={minMax.min}
+      max={minMax.max}
+    />
   );
 };
 
-const RangeSetting = ({ legend, styleProp, actionType, min, max, unit }) => {
-  const [settings, dispatch] = useContext(SettingsContext);
+const RangeSetting = ({ legend, styleProp, min, max, unit }) => {
+  const action = styleProp.charAt(0).toUpperCase() + styleProp.slice(1);
+  const [value, setValue] = useFontSamplerStore(
+    useShallow((state) => [state[styleProp], state.actions[`set${action}`]])
+  );
 
   const id = legend.split(' ').join('-');
-  const value = settings[styleProp];
 
   const handleChange = useCallback((e) => {
-    dispatch({ type: `SET_${actionType}`, payload: e.target.value });
+    setValue(e.target.value);
   }, []);
 
   return (
